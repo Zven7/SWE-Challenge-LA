@@ -1,0 +1,65 @@
+steps:
+  # -------------------------
+  # Install uv + dependencies
+  # -------------------------
+  - name: "python:3.12"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        pip install uv
+        uv sync --frozen
+
+  # -------------------------
+  # Run tests
+  # -------------------------
+  - name: "python:3.12"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        pip install uv
+        uv run pytest -q
+
+  # -------------------------
+  # Build Docker image
+  # -------------------------
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - build
+      - "-t"
+      - "us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$COMMIT_SHA"
+      - "."
+
+  # -------------------------
+  # Push image
+  # -------------------------
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - push
+      - "us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$COMMIT_SHA"
+
+  # -------------------------
+  # Deploy to Cloud Run
+  # -------------------------
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - swe-api
+      - --image
+      - us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$COMMIT_SHA
+      - --region
+      - us-central1
+      - --platform
+      - managed
+      - --allow-unauthenticated
+      - --set-env-vars
+      - MONGODB_URL=$$MONGODB_URL,MONGODB_DB_NAME=users_db,API_V1_STR=/api/v1
+
+images:
+  - us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$COMMIT_SHA
+
+substitutions:
+  _MONGODB_URL: "mongodb+srv://YOUR_ATLAS_URL"
