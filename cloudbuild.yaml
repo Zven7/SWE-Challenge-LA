@@ -56,10 +56,11 @@ steps:
       - managed
       - --allow-unauthenticated
       - --set-env-vars
-      - MONGODB_URL=$$MONGODB_URL,MONGODB_DB_NAME=users_db,API_V1_STR=/api/v1
+      - MONGODB_URL=$_MONGODB_URL,MONGODB_DB_NAME=$_MONGODB_DB_NAME,API_V1_STR=/api/v1
 
 images:
   - us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$COMMIT_SHA
 
 substitutions:
   _MONGODB_URL: "mongodb+srv://YOUR_ATLAS_URL"
+  _MONGODB_DB_NAME: "users_db"

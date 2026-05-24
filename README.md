@@ -85,3 +85,12 @@ curl -X DELETE http://localhost:8000/api/v1/users/<user_id>
 ```bash
 pytest -q
 ```
+
+## API documentation
+
+FastAPI automatically serves OpenAPI docs for this API at:
+
+- `http://localhost:8000/docs` — Swagger UI
+- `http://localhost:8000/redoc` — ReDoc
+
+Use these endpoints to explore request schemas, responses, and payload examples.
