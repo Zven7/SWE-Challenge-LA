@@ -7,13 +7,15 @@ services:
     ports:
       - "8000:8000"
     environment:
-      MONGODB_URL: mongodb://mongo:27017
-      MONGODB_DB_NAME: users_db
-      API_V1_STR: /api/v1
+      - MONGODB_URL=${MONGODB_URL}
+      - MONGODB_DB_NAME=${MONGODB_DB_NAME}
+      - API_V1_STR=${API_V1_STR}
+      - DEBUG=${DEBUG}
     depends_on:
       - mongo
     volumes:
       - .:/app
+      - /app/.venv
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   mongo:
