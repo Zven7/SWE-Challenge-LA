@@ -80,33 +80,50 @@ Then open:
 - `http://localhost:8000/docs`
 - `http://localhost:8000/redoc`
 
-## Docker Compose configuration
-
-The `docker-compose.yml` file defines two services:
-
-- `api`
-  - builds the local application image from `.`
-  - maps port `8000` on the host to `8000` in the container
-  - runs `uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload`
-  - mounts the workspace into `/app` for live code reload
-  - mounts `/app/.venv` to preserve the virtual environment across container restarts
-  - depends on the `mongo` service
-
-- `mongo`
-  - uses `mongo:7`
-  - exposes port `27017`
-  - persists data in the `mongo_data` named volume
-
-Compose service environment defaults:
-
-- `MONGODB_URL=mongodb://mongo:27017`
-- `MONGODB_DB_NAME=users_db`
-- `API_V1_STR=/api/v1`
-- `DEBUG=true`
 
 ## API Usage Examples
 
-### Create user
+The API is exposed under the versioned prefix `/api/v1`.
+
+### GET /api/v1/users
+
+Fetch paginated users, optionally filtered by role and active status.
+
+Query parameters:
+
+- `limit` — number of users returned (default `10`, maximum `100`)
+- `skip` — number of users to skip for paging (default `0`)
+- `role` — filter users by role, e.g. `admin` or `user`
+- `active` — filter users by active status, `true` or `false`
+
+Examples:
+
+```bash
+curl "http://localhost:8000/api/v1/users?limit=10&skip=0"
+```
+
+```bash
+curl "http://localhost:8000/api/v1/users?role=admin&active=true"
+```
+
+### POST /api/v1/users
+
+Create a new user.
+
+Required payload:
+
+```json
+{
+  "username": "jane_doe",
+  "email": "jane.doe@example.com",
+  "first_name": "Jane",
+  "last_name": "Doe",
+  "role": "user",
+  "active": true
+}
+```
+
+Example:
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/users/ \
@@ -121,19 +138,30 @@ curl -X POST http://localhost:8000/api/v1/users/ \
   }'
 ```
 
-### List users
+### GET /api/v1/users/{user_id}
 
-```bash
-curl "http://localhost:8000/api/v1/users?limit=10&skip=0&role=admin&active=true"
-```
+Retrieve a single user by ID.
 
-### Get user by ID
+Example:
 
 ```bash
 curl http://localhost:8000/api/v1/users/<user_id>
 ```
 
-### Update user
+### PUT /api/v1/users/{user_id}
+
+Update existing user fields.
+
+Example payload:
+
+```json
+{
+  "first_name": "Jane",
+  "active": false
+}
+```
+
+Example:
 
 ```bash
 curl -X PUT http://localhost:8000/api/v1/users/<user_id> \
@@ -144,7 +172,11 @@ curl -X PUT http://localhost:8000/api/v1/users/<user_id> \
   }'
 ```
 
-### Delete user
+### DELETE /api/v1/users/{user_id}
+
+Delete a user by ID.
+
+Example:
 
 ```bash
 curl -X DELETE http://localhost:8000/api/v1/users/<user_id>

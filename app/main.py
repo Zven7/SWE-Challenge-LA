@@ -18,13 +18,19 @@ configure_logging()
 async def lifespan(app: FastAPI):
     try:
         await init_db()
-        print("DB initialized")
-    except Exception as e:
-        print(f"DB init failed: {e}")
+        app.state.db_ready = True
+        logging.info("Database initialized successfully")
+    except Exception:
+        app.state.db_ready = False
+        logging.exception("Database initialization failed")
+        raise
 
-    yield
-
-    await close_db()
+    try:
+        yield
+    finally:
+        # ---- shutdown ----
+        await close_db()
+        logging.info("Database connection closed")
 
 
 app = FastAPI(
@@ -33,7 +39,6 @@ app = FastAPI(
     description="User Management API built with FastAPI, and MongoDB",
     lifespan=lifespan,
 )
-
 
 app.add_middleware(LoggingMiddleware)
 
@@ -44,6 +49,7 @@ async def health_check():
         "status": "ok",
         "service": settings.app_name,
         "version": settings.app_version,
+        "db": "connected" if getattr(app.state, "db_ready", False) else "disconnected",
     }
 
 
@@ -55,9 +61,7 @@ async def global_exception_handler(request, exc):
     logging.exception("Unhandled exception")
     return JSONResponse(
         status_code=500,
-        content={
-            "detail": "Internal server error",
-        },
+        content={"detail": "Internal server error"},
     )
 
 
