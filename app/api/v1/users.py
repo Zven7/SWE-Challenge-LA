@@ -2,14 +2,14 @@ from typing import Optional
 
 from fastapi import APIRouter, Query, status
 
-from app.schemas.user import (
+from ...schemas.user import (
     UserCreate,
     UserListResponse,
     UserResponse,
     UserUpdate,
 )
-from app.services.user_service import UserService
-from app.utils.pagination import DEFAULT_LIMIT, DEFAULT_SKIP, MAX_LIMIT
+from ...services.user_service import UserService
+from ...utils.pagination import DEFAULT_LIMIT, DEFAULT_SKIP, MAX_LIMIT
 
 router = APIRouter(prefix="/users", tags=["Users"])
 

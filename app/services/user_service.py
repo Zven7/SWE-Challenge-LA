@@ -1,14 +1,15 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from beanie import PydanticObjectId
+from bson.errors import InvalidId
 
-from app.core.exceptions import (
+from ..core.exceptions import (
     DuplicateUserException,
     UserNotFoundException,
 )
-from app.db.models.user import User
-from app.schemas.user import UserCreate, UserUpdate
+from ..db.models.user import User
+from ..schemas.user import UserCreate, UserUpdate
 
 class UserService:
     @staticmethod
@@ -66,7 +67,12 @@ class UserService:
     
     @staticmethod
     async def get_user(user_id: str) -> User:
-        user = await User.get(PydanticObjectId(user_id))
+        try:
+            object_id = PydanticObjectId(user_id)
+        except (ValueError, InvalidId):
+            raise UserNotFoundException()
+
+        user = await User.get(object_id)
 
         if not user:
             raise UserNotFoundException()
@@ -79,7 +85,12 @@ class UserService:
         user_id: str,
         payload: UserUpdate,
     ) -> User:
-        user = await User.get(PydanticObjectId(user_id))
+        try:
+            object_id = PydanticObjectId(user_id)
+        except (ValueError, InvalidId):
+            raise UserNotFoundException()
+
+        user = await User.get(object_id)
 
         if not user:
             raise UserNotFoundException()
@@ -89,7 +100,7 @@ class UserService:
         for field, value in update_data.items():
             setattr(user, field, value)
 
-        user.updated_at = datetime.utcnow()
+        user.updated_at = datetime.now(timezone.utc)
 
         await user.save()
 
@@ -97,7 +108,12 @@ class UserService:
     
     @staticmethod
     async def delete_user(user_id: str):
-        user = await User.get(PydanticObjectId(user_id))
+        try:
+            object_id = PydanticObjectId(user_id)
+        except (ValueError, InvalidId):
+            raise UserNotFoundException()
+
+        user = await User.get(object_id)
 
         if not user:
             raise UserNotFoundException()

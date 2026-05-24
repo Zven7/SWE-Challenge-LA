@@ -227,7 +227,7 @@ dev = [
 requires-dist = [
     { name = "beanie", specifier = ">=2.1.0" },
     { name = "fastapi", specifier = ">=0.136.1" },
-    { name = "motor", specifier = ">=3.7.1" },
+    { name = "motor", specifier = ">=3.7.0,<4.0" },
     { name = "pydantic", extras = ["email"], specifier = ">=2.13.4" },
     { name = "pydantic-settings", specifier = ">=2.14.1" },
     { name = "python-dotenv", specifier = ">=1.2.2" },

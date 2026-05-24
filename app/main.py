@@ -1,13 +1,14 @@
-from contextlib import asynccontextmanager
+﻿from contextlib import asynccontextmanager
+import logging
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.exception_handlers import http_exception_handler
 from fastapi.responses import JSONResponse
 
-from app.api.v1.router import api_router
-from app.core.config import settings
-from app.db.client import init_db, close_db
-from app.api.middlewares.logging import configure_logging
-from app.api.middlewares.logging import LoggingMiddleware
+from .api.v1.router import api_router
+from .core.config import settings
+from .db.client import init_db, close_db
+from .api.middlewares.logging import configure_logging, LoggingMiddleware
 
 
 configure_logging()
@@ -21,8 +22,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title=settings.APP_NAME,
-    version=settings.APP_VERSION,
+    title=settings.app_name,
+    version=settings.app_version,
     description="User Management API built with FastAPI, and MongoDB",
     lifespan=lifespan,
 )
@@ -35,13 +36,17 @@ app.add_middleware(LoggingMiddleware)
 async def health_check():
     return {
         "status": "ok",
-        "service": settings.APP_NAME,
-        "version": settings.APP_VERSION,
+        "service": settings.app_name,
+        "version": settings.app_version,
     }
 
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
+    if isinstance(exc, HTTPException):
+        return await http_exception_handler(request, exc)
+
+    logging.exception("Unhandled exception")
     return JSONResponse(
         status_code=500,
         content={
@@ -50,4 +55,4 @@ async def global_exception_handler(request, exc):
     )
 
 
-app.include_router(api_router, prefix=settings.API_V1_STR)
+app.include_router(api_router, prefix=settings.api_v1_str)

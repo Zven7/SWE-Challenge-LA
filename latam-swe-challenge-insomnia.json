@@ -1,0 +1,226 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-05-24T00:00:00.000Z",
+  "__export_source": "Insomnia.desktop.app:v10.0.0",
+  "resources": [
+    {
+      "_id": "wrk_latam_swe_challenge",
+      "parentId": null,
+      "modified": 1779571200000,
+      "created": 1779571200000,
+      "name": "LATAM SWE Challenge",
+      "description": "FastAPI User Management API",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_base",
+      "parentId": "wrk_latam_swe_challenge",
+      "modified": 1779571200000,
+      "created": 1779571200000,
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:8000",
+        "api_v1": "/api/v1",
+        "user_id": ""
+      },
+      "_type": "environment"
+    },
+    {
+      "_id": "env_local",
+      "parentId": "env_base",
+      "modified": 1779571200000,
+      "created": 1779571200000,
+      "name": "Local",
+      "data": {
+        "base_url": "http://localhost:8000"
+      },
+      "_type": "environment"
+    },
+    {
+      "_id": "env_prod",
+      "parentId": "env_base",
+      "modified": 1779571200000,
+      "created": 1779571200000,
+      "name": "Production",
+      "data": {
+        "base_url": "https://your-production-api.com"
+      },
+      "_type": "environment"
+    },
+    {
+      "_id": "fld_users",
+      "parentId": "wrk_latam_swe_challenge",
+      "modified": 1779571200000,
+      "created": 1779571200000,
+      "name": "Users",
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_create_user",
+      "parentId": "fld_users",
+      "modified": 1779571200000,
+      "created": 1779571200000,
+      "url": "{{ _.base_url }}{{ _.api_v1 }}/users/",
+      "name": "Create User",
+      "description": "Create a new user",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"username\": \"jane_doe\",\n  \"email\": \"jane.doe@example.com\",\n  \"first_name\": \"Jane\",\n  \"last_name\": \"Doe\",\n  \"role\": \"user\",\n  \"active\": true\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_list_users",
+      "parentId": "fld_users",
+      "modified": 1779571200000,
+      "created": 1779571200000,
+      "url": "{{ _.base_url }}{{ _.api_v1 }}/users?limit=10&skip=0&role=admin&active=true",
+      "name": "List Users",
+      "description": "Get users with filters",
+      "method": "GET",
+      "parameters": [
+        {
+          "name": "limit",
+          "value": "10"
+        },
+        {
+          "name": "skip",
+          "value": "0"
+        },
+        {
+          "name": "role",
+          "value": "admin"
+        },
+        {
+          "name": "active",
+          "value": "true"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_get_user",
+      "parentId": "fld_users",
+      "modified": 1779571200000,
+      "created": 1779571200000,
+      "url": "{{ _.base_url }}{{ _.api_v1 }}/users/{{ _.user_id }}",
+      "name": "Get User By ID",
+      "description": "Get a user by MongoDB ObjectId",
+      "method": "GET",
+      "_type": "request"
+    },
+    {
+      "_id": "req_update_user",
+      "parentId": "fld_users",
+      "modified": 1779571200000,
+      "created": 1779571200000,
+      "url": "{{ _.base_url }}{{ _.api_v1 }}/users/{{ _.user_id }}",
+      "name": "Update User",
+      "description": "Update existing user",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"first_name\": \"Jane Updated\",\n  \"active\": false\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_delete_user",
+      "parentId": "fld_users",
+      "modified": 1779571200000,
+      "created": 1779571200000,
+      "url": "{{ _.base_url }}{{ _.api_v1 }}/users/{{ _.user_id }}",
+      "name": "Delete User",
+      "description": "Delete user by ID",
+      "method": "DELETE",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_edge_cases",
+      "parentId": "wrk_latam_swe_challenge",
+      "modified": 1779571200000,
+      "created": 1779571200000,
+      "name": "Edge Cases",
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_duplicate_user",
+      "parentId": "fld_edge_cases",
+      "modified": 1779571200000,
+      "created": 1779571200000,
+      "url": "{{ _.base_url }}{{ _.api_v1 }}/users/",
+      "name": "Duplicate User (409)",
+      "description": "Should return 409 conflict",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"username\": \"jane_doe\",\n  \"email\": \"jane.doe@example.com\",\n  \"first_name\": \"Jane\",\n  \"last_name\": \"Doe\",\n  \"role\": \"user\",\n  \"active\": true\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_invalid_objectid",
+      "parentId": "fld_edge_cases",
+      "modified": 1779571200000,
+      "created": 1779571200000,
+      "url": "{{ _.base_url }}{{ _.api_v1 }}/users/invalid-object-id",
+      "name": "Invalid ObjectId (404)",
+      "description": "Should return 404 not found",
+      "method": "GET",
+      "_type": "request"
+    },
+    {
+      "_id": "req_invalid_payload",
+      "parentId": "fld_edge_cases",
+      "modified": 1779571200000,
+      "created": 1779571200000,
+      "url": "{{ _.base_url }}{{ _.api_v1 }}/users/",
+      "name": "Invalid Payload (422)",
+      "description": "Should return validation error",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"username\": 123,\n  \"email\": \"not-an-email\",\n  \"active\": \"yes\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "_type": "request"
+    },
+    {
+      "_id": "req_missing_user",
+      "parentId": "fld_edge_cases",
+      "modified": 1779571200000,
+      "created": 1779571200000,
+      "url": "{{ _.base_url }}{{ _.api_v1 }}/users/665000000000000000000000",
+      "name": "Missing User (404)",
+      "description": "Should return user not found",
+      "method": "GET",
+      "_type": "request"
+    }
+  ]
+}

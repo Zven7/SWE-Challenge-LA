@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 
 from beanie import Document
@@ -17,8 +17,8 @@ class User(Document):
     last_name: str = Field(..., min_length=1, max_length=100)
     role: UserRole
     active: bool = True
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     class Settings:
         name = "users"
         indexes = [
