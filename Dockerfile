@@ -22,4 +22,4 @@ COPY --from=builder /app /app
 
 ENV PATH="/app/.venv/bin:$PATH"
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "echo STARTING && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
