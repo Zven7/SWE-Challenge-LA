@@ -16,8 +16,14 @@ configure_logging()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await init_db()
+    try:
+        await init_db()
+        print("DB initialized")
+    except Exception as e:
+        print(f"DB init failed: {e}")
+
     yield
+
     await close_db()
 
 
