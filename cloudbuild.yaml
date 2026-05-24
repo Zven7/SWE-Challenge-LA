@@ -19,7 +19,7 @@ steps:
     args:
       - build
       - "-t"
-      - "us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$SHORT_SHA"
+      - "us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$BUILD_ID"
       - "."
 
   # -------------------------
@@ -28,7 +28,7 @@ steps:
   - name: "gcr.io/cloud-builders/docker"
     args:
       - push
-      - "us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$SHORT_SHA"
+      - "us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$BUILD_ID"
 
   # -------------------------
   # Deploy to Cloud Run
@@ -40,7 +40,7 @@ steps:
       - deploy
       - swe-api
       - --image
-      - "us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$SHORT_SHA"
+      - "us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$BUILD_ID"
       - --region
       - us-central1
       - --platform
@@ -50,7 +50,7 @@ steps:
       - MONGODB_URL=$_MONGODB_URL,MONGODB_DB_NAME=$_MONGODB_DB_NAME,API_V1_STR=/api/v1
 
 images:
-  - "us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$SHORT_SHA"
+  - "us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$BUILD_ID"
 
 substitutions:
   _MONGODB_URL: "mongodb+srv://YOUR_ATLAS_URL"
