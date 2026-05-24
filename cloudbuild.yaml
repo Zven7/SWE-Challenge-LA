@@ -1,24 +1,15 @@
 steps:
   # -------------------------
-  # Install uv + dependencies
+  # Install dependencies + run tests
   # -------------------------
   - name: "python:3.12"
     entrypoint: bash
     args:
       - -c
       - |
+        set -e
         pip install uv
         uv sync --frozen
-
-  # -------------------------
-  # Run tests
-  # -------------------------
-  - name: "python:3.12"
-    entrypoint: bash
-    args:
-      - -c
-      - |
-        pip install uv
         uv run pytest -q
 
   # -------------------------
@@ -28,7 +19,7 @@ steps:
     args:
       - build
       - "-t"
-      - "us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$COMMIT_SHA"
+      - "us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$SHORT_SHA"
       - "."
 
   # -------------------------
@@ -37,7 +28,7 @@ steps:
   - name: "gcr.io/cloud-builders/docker"
     args:
       - push
-      - "us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$COMMIT_SHA"
+      - "us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$SHORT_SHA"
 
   # -------------------------
   # Deploy to Cloud Run
@@ -49,7 +40,7 @@ steps:
       - deploy
       - swe-api
       - --image
-      - us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$COMMIT_SHA
+      - "us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$SHORT_SHA"
       - --region
       - us-central1
       - --platform
@@ -59,7 +50,7 @@ steps:
       - MONGODB_URL=$_MONGODB_URL,MONGODB_DB_NAME=$_MONGODB_DB_NAME,API_V1_STR=/api/v1
 
 images:
-  - us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$COMMIT_SHA
+  - "us-central1-docker.pkg.dev/$PROJECT_ID/swe-api/swe-api:$SHORT_SHA"
 
 substitutions:
   _MONGODB_URL: "mongodb+srv://YOUR_ATLAS_URL"
